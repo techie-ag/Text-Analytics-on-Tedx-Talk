@@ -1,0 +1,140 @@
+---
+title: "MA331 Coursework"
+author: "Augusta Onuodafin"
+date: '2022-03-21'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+
+# load the required packages
+library(tidytext)
+library(tidyverse)
+library(ggrepel)
+library(dsEssex)
+
+#load the 'ted_talks' data
+data(ted_talks)
+
+#glimpse the "ted_talks" to have an idea of what is in it 
+#dplyr::glimpse(ted_talks)
+
+#filter the "ted_talks" of each speaker
+Mydata <- ted_talks %>%
+   filter(speaker %in% c("Catherine Mohr", "Deborah Gordon"))
+
+Mydata
+
+```
+
+## Introduction
+
+Catherine Mohr and Deborah Gordon in their respective talks, tries to introduces us into their Worlds of Science, with Mohr specifically talking about green energy, the future of robotics in surgery and how she became a part sea urchin, narrowing it to her love life. On the other hand, Gordon talked so well about her interest in the Ant colony and how it can be referenced into our work space, drawing lessons about what it teaches about the brain, cancer and the internet and what living inside the colony would look like. The talks of both speakers can be linked back to the years between 2003-2018.
+This project aims at studying the word frequencies of the individual ted talks, how often some words were used, which words formed the top words, which were considered not exciting to be seen in our output etc. Also,a sentiment approach was used to analyze against words used by each speakers using the NCR sentimental analysis approach and graphs were plotted against each results.
+
+
+```{r, tokenization,echo=FALSE, message=FALSE}
+#carryout tokenization
+tidy_talks <- ted_talks %>% # assign the function
+  tidytext::unnest_tokens (word, text) 
+ 
+#removing "stop words" from the tidy_talks
+ted_talks_nonstop <- tidy_talks %>%
+  anti_join(get_stopwords())
+
+# identifying the top words of each of the speaker
+Mohr_words <- ted_talks_nonstop %>%
+  dplyr::filter(speaker == "Catherine Mohr") %>% 
+  dplyr::count(speaker, word, sort = TRUE)
+
+Gordon_words <- ted_talks_nonstop %>%
+  dplyr::filter(speaker == "Deborah Gordon") %>% 
+  dplyr::count(speaker, word, sort = TRUE)
+```
+
+## Methods
+
+The main function of this project on the ted talks is to count the word frequencies and carryout sentimental analysis on the words and i will be starting by filtering the talks of my speakers from the data set, afterwards, using tokenization process,the words were broken down into useful units of text for easy analysis which were arranged in specific structures using the tidytext function. I observed some words that are uninteresting to text analysis which are known as stop words and using the stop word lexicon, those words were able to be removed. The next step was to identify the first 25 rows containing the top words used by each of the speakers which was properly visualized on a graph for easier reading and understanding.
+The sentimental analysis of each speakers words meant that i had to analyse the speakers against their emotions and sentiments using the NCR lexicon and in this, i worked with analysing for the positive and negative words. This can be used to deduce facts about each speakers state during each of the ted talks. The sentimental analysis score from both speakers was plotted against each other.
+
+
+```{r, top words identification,echo=FALSE}
+# identifying the top words of each of the speaker
+Mohr_words <- ted_talks_nonstop %>%
+  dplyr::filter(speaker == "Catherine Mohr") %>% 
+  dplyr::count(speaker, word, sort = TRUE)
+
+Gordon_words <- ted_talks_nonstop %>%
+  dplyr::filter(speaker == "Deborah Gordon") %>% 
+  dplyr::count(speaker, word, sort = TRUE)
+
+#carry out visualization of each speakers top words
+ Mohr_words %>%
+  dplyr::slice_max(n, n = 25) %>%
+  dplyr::mutate(word = reorder(word, n)) %>%
+  ggplot2::ggplot(aes(n, word)) + ggplot2::geom_col() 
+
+Gordon_words %>%
+  dplyr::slice_max(n, n = 25) %>%
+  dplyr::mutate(word = reorder(word, n)) %>%
+  ggplot2::ggplot(aes(n, word)) + ggplot2::geom_col() 
+
+dplyr::bind_rows(Mohr_words, Gordon_words) %>% # comparing the the speakers top words by visualizing them
+  group_by(word) %>% # group the data set by words
+  filter(sum(n) > 10) %>% # filter sums greater than 10
+  ungroup() %>%
+  pivot_wider(names_from = "speaker", values_from = "n", values_fill = 0) %>% # change the data frame
+  ggplot(aes(`Catherine Mohr`, `Deborah Gordon`)) + # each individual graph is assigned the speakers name
+  geom_abline(color = "Brown", size = 1.5, alpha = 1.5, lty = 3) +
+  geom_text_repel(aes(label = word), max.overlaps = 93) +
+  coord_fixed()
+```
+ 
+ 
+```{r, Sentiment Analysis,,echo=FALSE, message=FALSE, results='hide'}
+#Sentimental Analysis of the Speakers Talk using the NRC sentiment
+
+MyData <- ted_talks_nonstop %>%
+  inner_join(get_sentiments('nrc')) %>% # pair words with sentiments in them using the "nrc" sentiment
+  count(speaker, sentiment) %>% # count the frequency of the sentiment for each speaker
+  pivot_wider(names_from = speaker, values_from = n, values_fill = 0) # convert the data frames
+
+MyData %>%
+  ggplot(aes(x=reorder(factor(sentiment), `Catherine Mohr`), `Catherine Mohr`, fill=sentiment)) +
+  geom_bar(stat = "identity", position = "dodge", show.legend = FALSE) + # plot sentiment frequency for both speakers using the bar chart ie Catherine Mohr
+  coord_flip() + #the x and y axis should be flipped
+  labs(x = 'sentiments',caption = "(a)Sentiments from Deborah Gordon " ) # change the label for y axis and give the chart a caption
+  # changed my text color and text style
+ 
+
+MyData %>%
+  ggplot(aes(x=reorder(factor(sentiment), `Deborah Gordon`), `Deborah Gordon`, fill=sentiment)) +
+  geom_bar(stat = "identity", position = "dodge", show.legend = FALSE) + # plot sentiment frequency for both speakers using the bar chart ie Deborah Gordon
+  coord_flip() + # flip both x and y axis
+  labs(x = 'sentiments', caption = "(a)Sentiment from Deborah Gordon " )  # change the label for y axis and give the chart a caption
+  theme(plot.caption = element_text(colour = "orange", face = "open sans")) # changed my text color and text style
+  
+```
+## Results
+
+It can be observed that the two most commonly used words by Catherine Mohr were 'can' and 'energy', while that of Deborah Gordon were 'ants' and 'ant'. Getting a clearer understanding of the sentimental words that are likely to be assigned to either or each of the speakers,and using the log odd ratio to get the outputs from the inputs, we saw that Mohr's work showed a great usage of positive words, and words like 'surprise', 'joy', 'trust', 'anticipation' easily identified. Looking at Gordon's work,there were also more positive words than negative words with 'trust' appearing as the most used, negative words found included 'disgust', 'anger', 'sadness', 'fear'. These output can make us easily understand how both negative and positive words were used in the speakers tedtalks and how often they appeared.
+
+```{r Log_OR Ratio,echo=FALSE, message=FALSE}
+MyData %>%
+  mutate(OR = dsEssex::compute_OR(`Catherine Mohr`, `Deborah Gordon`, correction = FALSE), log_OR = log(OR), sentiment = reorder(sentiment, log_OR)) %>% # carrying out futgar analysis, produce new columns for th e dataset
+  ggplot(aes(sentiment, log_OR, fill = log_OR < 0)) + # plot sentiment against log_OR
+  geom_col(show.legend = FALSE) +
+  ylab("log odds ratio") +
+  coord_flip()
+```
+
+ 
+    
+## Discussion  
+
+From the Global Environment , it can be seen that there are a list of observable variables under some of the functions and objects that i had to study and analyse. The data from Catherine showed a little difference in the observable variable when compared to Deborah's. While comparing for the word frequencies of both speakers, i noticed that at a max.overlap of less than 93, it had much underlying max overlaps which halted my work from knitting to html, this may be as a result of the so many used words used in the ted talk. Much works can be done on these data sets depending on what other information we are trying to get out of them, personally, i believe that using other sentimental analysis lexicon like the 'bing', 'AFINN' lexicons either in a two ways approach or in a one way approach as i have used, there will be bound to be more useful information to be derived from them.
