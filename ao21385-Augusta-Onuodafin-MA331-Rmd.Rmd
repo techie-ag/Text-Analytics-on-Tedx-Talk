@@ -1,12 +1,4 @@
 ---
-title: "MA331 Coursework"
-author: "Augusta Onuodafin"
-date: '2022-03-21'
-output:
-  html_document: default
-  pdf_document: default
----
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
