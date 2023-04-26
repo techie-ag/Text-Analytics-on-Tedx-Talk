@@ -26,8 +26,13 @@ Mydata
 
 ## Introduction
 
-Catherine Mohr and Deborah Gordon in their respective talks, tries to introduces us into their Worlds of Science, with Mohr specifically talking about green energy, the future of robotics in surgery and how she became a part sea urchin, narrowing it to her love life. On the other hand, Gordon talked so well about her interest in the Ant colony and how it can be referenced into our work space, drawing lessons about what it teaches about the brain, cancer and the internet and what living inside the colony would look like. The talks of both speakers can be linked back to the years between 2003-2018.
-This project aims at studying the word frequencies of the individual ted talks, how often some words were used, which words formed the top words, which were considered not exciting to be seen in our output etc. Also,a sentiment approach was used to analyze against words used by each speakers using the NCR sentimental analysis approach and graphs were plotted against each results.
+Catherine Mohr and Deborah Gordon in their respective talks, tries to introduces us into their Worlds of Science, with Mohr specifically talking about green energy, 
+the future of robotics in surgery and how she became a part sea urchin, narrowing it to her love life. On the other hand, Gordon talked so well about her interest in
+the Ant colony and how it can be referenced into our work space, drawing lessons about what it teaches about the brain, cancer and the internet and what living inside
+the colony would look like. The talks of both speakers can be linked back to the years between 2003-2018.
+This project aims at studying the word frequencies of the individual ted talks, how often some words were used, which words formed the top words, which were considered
+not exciting to be seen in our output etc. Also,a sentiment approach was used to analyze against words used by each speakers using the NCR sentimental analysis 
+approach and graphs were plotted against each results.
 
 
 ```{r, tokenization,echo=FALSE, message=FALSE}
@@ -51,8 +56,14 @@ Gordon_words <- ted_talks_nonstop %>%
 
 ## Methods
 
-The main function of this project on the ted talks is to count the word frequencies and carryout sentimental analysis on the words and i will be starting by filtering the talks of my speakers from the data set, afterwards, using tokenization process,the words were broken down into useful units of text for easy analysis which were arranged in specific structures using the tidytext function. I observed some words that are uninteresting to text analysis which are known as stop words and using the stop word lexicon, those words were able to be removed. The next step was to identify the first 25 rows containing the top words used by each of the speakers which was properly visualized on a graph for easier reading and understanding.
-The sentimental analysis of each speakers words meant that i had to analyse the speakers against their emotions and sentiments using the NCR lexicon and in this, i worked with analysing for the positive and negative words. This can be used to deduce facts about each speakers state during each of the ted talks. The sentimental analysis score from both speakers was plotted against each other.
+The main function of this project on the ted talks is to count the word frequencies and carryout sentimental analysis on the words and i will be starting by filtering
+the talks of my speakers from the data set, afterwards, using tokenization process,the words were broken down into useful units of text for easy analysis which were 
+arranged in specific structures using the tidytext function. I observed some words that are uninteresting to text analysis which are known as stop words and using the 
+stop word lexicon, those words were able to be removed. The next step was to identify the first 25 rows containing the top words used by each of the speakers which was
+properly visualized on a graph for easier reading and understanding.
+The sentimental analysis of each speakers words meant that i had to analyse the speakers against their emotions and sentiments using the NCR lexicon and in this, 
+i worked with analysing for the positive and negative words. This can be used to deduce facts about each speakers state during each of the ted talks. 
+The sentimental analysis score from both speakers was plotted against each other.
 
 
 ```{r, top words identification,echo=FALSE}
@@ -114,11 +125,17 @@ MyData %>%
 ```
 ## Results
 
-It can be observed that the two most commonly used words by Catherine Mohr were 'can' and 'energy', while that of Deborah Gordon were 'ants' and 'ant'. Getting a clearer understanding of the sentimental words that are likely to be assigned to either or each of the speakers,and using the log odd ratio to get the outputs from the inputs, we saw that Mohr's work showed a great usage of positive words, and words like 'surprise', 'joy', 'trust', 'anticipation' easily identified. Looking at Gordon's work,there were also more positive words than negative words with 'trust' appearing as the most used, negative words found included 'disgust', 'anger', 'sadness', 'fear'. These output can make us easily understand how both negative and positive words were used in the speakers tedtalks and how often they appeared.
+It can be observed that the two most commonly used words by Catherine Mohr were 'can' and 'energy', while that of Deborah Gordon were 'ants' and 'ant'.
+Getting a clearer understanding of the sentimental words that are likely to be assigned to either or each of the speakers,and using the log odd ratio to get the 
+outputs from the inputs, we saw that Mohr's work showed a great usage of positive words, and words like 'surprise', 'joy', 'trust', 'anticipation' easily identified.
+Looking at Gordon's work,there were also more positive words than negative words with 'trust' appearing as the most used, negative words found included 'disgust', 
+'anger', 'sadness', 'fear'. These output can make us easily understand how both negative and positive words were used in the speakers tedtalks and how often they
+appeared.
 
 ```{r Log_OR Ratio,echo=FALSE, message=FALSE}
 MyData %>%
-  mutate(OR = dsEssex::compute_OR(`Catherine Mohr`, `Deborah Gordon`, correction = FALSE), log_OR = log(OR), sentiment = reorder(sentiment, log_OR)) %>% # carrying out futgar analysis, produce new columns for th e dataset
+  mutate(OR = dsEssex::compute_OR(`Catherine Mohr`, `Deborah Gordon`, correction = FALSE), log_OR = log(OR), sentiment = reorder(sentiment, log_OR)) %>% # carrying out
+  futgar analysis, produce new columns for th e dataset
   ggplot(aes(sentiment, log_OR, fill = log_OR < 0)) + # plot sentiment against log_OR
   geom_col(show.legend = FALSE) +
   ylab("log odds ratio") +
@@ -129,4 +146,9 @@ MyData %>%
     
 ## Discussion  
 
-From the Global Environment , it can be seen that there are a list of observable variables under some of the functions and objects that i had to study and analyse. The data from Catherine showed a little difference in the observable variable when compared to Deborah's. While comparing for the word frequencies of both speakers, i noticed that at a max.overlap of less than 93, it had much underlying max overlaps which halted my work from knitting to html, this may be as a result of the so many used words used in the ted talk. Much works can be done on these data sets depending on what other information we are trying to get out of them, personally, i believe that using other sentimental analysis lexicon like the 'bing', 'AFINN' lexicons either in a two ways approach or in a one way approach as i have used, there will be bound to be more useful information to be derived from them.
+From the Global Environment , it can be seen that there are a list of observable variables under some of the functions and objects that i had to study and analyse. 
+The data from Catherine showed a little difference in the observable variable when compared to Deborah's. While comparing for the word frequencies of both speakers,
+i noticed that at a max.overlap of less than 93, it had much underlying max overlaps which halted my work from knitting to html, this may be as a result of the so many
+used words used in the ted talk. Much works can be done on these data sets depending on what other information we are trying to get out of them, personally, i believe 
+that using other sentimental analysis lexicon like the 'bing', 'AFINN' lexicons either in a two ways approach or in a one way approach as i have used, there will be 
+bound to be more useful information to be derived from them.
